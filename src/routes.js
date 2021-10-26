@@ -1,6 +1,6 @@
 /**
  * Title: Route handler
- * Description: handle all about routing
+ * Description: Handle all about routing
  * Author: Samin Yasar
  * Date: 24/October/2021
  */

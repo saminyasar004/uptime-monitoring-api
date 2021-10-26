@@ -2,12 +2,13 @@
     "name": "uptime-monitoring-api",
     "version": "1.0.0",
     "description": "A RESTful API to monitor up or down time of user defined links",
-    "main": "app.js",
-    "scripts": {
-        "start": "nodemon app.js"
-    },
     "author": "Samin Yasar",
     "license": "MIT",
+    "main": "app.js",
+    "scripts": {
+        "start": "nodemon app.js",
+        "production": "node app.js"
+    },
     "devDependencies": {
         "eslint": "^8.1.0",
         "eslint-config-airbnb-base": "^14.2.1",

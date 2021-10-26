@@ -1,6 +1,6 @@
 /**
  * Title: Request & response handler
- * Description: handle everything about request and response
+ * Description: Handle everything about request and response
  * Author: Samin Yasar
  * Date: 24/October/2021
  */
@@ -38,17 +38,17 @@ reqResHandler.handle = (req, res) => {
     });
     req.on("end", () => {
         reqBody += decoder.end();
-    });
 
-    chosenHandler(requestProps, (status, payload) => {
-        const statusCode = typeof status === "number" ? status : 500;
-        const payLoad = typeof payload === "object" ? payload : {};
-        const payLoadString = JSON.stringify(payLoad);
+        chosenHandler(requestProps, (status, payload) => {
+            const statusCode = typeof status === "number" ? status : 500;
+            const payLoad = typeof payload === "object" ? payload : {};
+            const payLoadString = JSON.stringify(payLoad);
 
-        // response handling
-        res.writeHead(statusCode);
-        res.end(payLoadString);
-        res.end(reqBody);
+            // response handling
+            res.writeHead(statusCode);
+            res.write(payLoadString);
+            res.end(reqBody);
+        });
     });
 };
 
