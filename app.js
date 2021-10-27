@@ -7,40 +7,14 @@
 
 // Dependencies
 const http = require("http");
-
-const { handle: reqResHandler } = require("./src/reqResHandler");
-const environment = require("./src/environment");
-const dataLibrary = require("./src/lib/data");
+const { handle: reqResHandler } = require("./src/helpers/reqResHandler");
+const environment = require("./src/helpers/environment");
 
 // Module scaffolding
 const app = {};
 
 // Configuration
 app.config = {};
-
-// ? Testing dataLibrary
-// TODO: remove it later
-// dataLibrary.create("samin", "facebook", { username: "saminyasar004" }, (err) => {
-//     if (!err) {
-//         console.log("Successfully created file");
-//     } else {
-//         console.log(err);
-//     }
-// });
-// dataLibrary.update("samin", "facebook", { fname: "mahmud" }, (err) => {
-//     if (!err) {
-//         console.log("Successfully updated");
-//     } else {
-//         console.log(err);
-//     }
-// });
-// dataLibrary.delete("samin", "facebook", (err) => {
-//     if (!err) {
-//         console.log("successfully deleted");
-//     } else {
-//         console.log(err);
-//     }
-// });
 
 // Defination of the init function
 app.init = () => {

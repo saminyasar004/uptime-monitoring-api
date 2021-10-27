@@ -31,7 +31,7 @@ lib.create = (dir, fileName, data, callback) => {
         if (!err) {
             console.log("Successfully created directory.");
         } else {
-            console.log("Cannot create directory.");
+            console.log("Cannot create directory. Maybe a it is already exists.");
         }
     });
     // Open file to write

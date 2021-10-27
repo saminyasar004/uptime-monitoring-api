@@ -15,7 +15,7 @@ notFoundHandler.handle = (requestProps, callback) => {
     console.log(requestProps);
 
     callback(404, {
-        message: "Not found!",
+        error: "Not found!",
     });
 };
 

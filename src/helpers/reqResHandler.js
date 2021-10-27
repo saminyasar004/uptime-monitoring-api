@@ -8,8 +8,8 @@
 // Dependencies
 const url = require("url");
 const { StringDecoder } = require("string_decoder");
-
 const routes = require("./routes");
+const utilities = require("./utilities");
 
 // Module scaffolding
 const reqResHandler = {};
@@ -38,6 +38,7 @@ reqResHandler.handle = (req, res) => {
     });
     req.on("end", () => {
         reqBody += decoder.end();
+        requestProps.reqBody = utilities.parseJSON(reqBody);
 
         chosenHandler(requestProps, (status, payload) => {
             const statusCode = typeof status === "number" ? status : 500;
@@ -45,9 +46,8 @@ reqResHandler.handle = (req, res) => {
             const payLoadString = JSON.stringify(payLoad);
 
             // response handling
-            res.writeHead(statusCode);
-            res.write(payLoadString);
-            res.end(reqBody);
+            res.writeHead(statusCode, { "Content-Type": "application.json" });
+            res.end(payLoadString);
         });
     });
 };
