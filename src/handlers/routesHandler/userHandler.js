@@ -1,8 +1,13 @@
+/* eslint-disable no-underscore-dangle */
 /**
  * Title: User handler
  * Description: Handle user CRUD
  * Author: Samin Yasar
  * Date: 24/October/2021
+ */
+
+/**
+ * TODO: Authenticate the user while get, put, delete operation doing...
  */
 
 // Dependencies
@@ -28,6 +33,33 @@ userHandler._users = {};
 
 // Get method
 userHandler._users.get = (requestProps, callback) => {
+    const userName =
+        typeof requestProps.queryStringObj.userName === "string" &&
+        requestProps.queryStringObj.userName.trim().length > 0
+            ? requestProps.queryStringObj.userName
+            : null;
+    if (userName) {
+        // lookup the user
+        dataLibrary.read("users", userName, (err, user) => {
+            if (!err && user) {
+                const userData = utilities.parseJSON(user);
+                delete userData.password;
+                callback(200, userData);
+            } else {
+                callback(404, {
+                    error: "Your requested user's data couldn't find.",
+                });
+            }
+        });
+    } else {
+        callback(404, {
+            error: "Please provide a username.",
+        });
+    }
+};
+
+// Post method
+userHandler._users.post = (requestProps, callback) => {
     const firstName =
         typeof requestProps.reqBody.firstName === "string" &&
         requestProps.reqBody.firstName.trim().length > 0
@@ -60,8 +92,8 @@ userHandler._users.get = (requestProps, callback) => {
 
     if (firstName && lastName && userName && phoneNumber && password && tosAgreement) {
         // make sure that the user doesn't exists in our file system
-        dataLibrary.read("users", `${userName}_${phoneNumber}`, (err, user) => {
-            if (err) {
+        dataLibrary.read("users", userName, (readError) => {
+            if (readError) {
                 // The username & phone number is valid
                 const userObj = {
                     firstName,
@@ -71,11 +103,11 @@ userHandler._users.get = (requestProps, callback) => {
                     password,
                     tosAgreement,
                 };
-                dataLibrary.create("users", `${userName}_${phoneNumber}`, userObj, (err) => {
-                    if (!err) {
+                dataLibrary.create("users", userName, userObj, (createError) => {
+                    if (!createError) {
                         // User create done!
                         callback(200, {
-                            message: `Successfully created ${userName}'s user data.`,
+                            message: `Successfully created a user data.`,
                         });
                     } else {
                         // couldn't create a user file
@@ -87,7 +119,7 @@ userHandler._users.get = (requestProps, callback) => {
             } else {
                 // The username or phone number is not valid
                 callback(405, {
-                    error: "The username or phone number maybe already taken. Please use another one.",
+                    error: "The username maybe already taken. Please use another one.",
                 });
             }
         });
@@ -98,23 +130,113 @@ userHandler._users.get = (requestProps, callback) => {
     }
 };
 
-// Post method
-userHandler._users.post = (requestProps, callback) => {
-    // Code here
-};
-
 // Put method
 userHandler._users.put = (requestProps, callback) => {
-    callback(200, {
-        message: "This is from put method",
-    });
+    const firstName =
+        typeof requestProps.reqBody.firstName === "string" &&
+        requestProps.reqBody.firstName.trim().length > 0
+            ? requestProps.reqBody.firstName
+            : null;
+    const lastName =
+        typeof requestProps.reqBody.lastName === "string" &&
+        requestProps.reqBody.lastName.trim().length > 0
+            ? requestProps.reqBody.lastName
+            : null;
+    const userName =
+        typeof requestProps.reqBody.userName === "string" &&
+        requestProps.reqBody.userName.trim().length > 0
+            ? requestProps.reqBody.userName
+            : null;
+    const phoneNumber =
+        typeof requestProps.reqBody.phoneNumber === "string" &&
+        requestProps.reqBody.phoneNumber.trim().length === 11
+            ? requestProps.reqBody.phoneNumber
+            : null;
+    const password =
+        typeof requestProps.reqBody.password === "string" &&
+        requestProps.reqBody.password.trim().length > 0
+            ? utilities.encrypt(requestProps.reqBody.password)
+            : null;
+    if (userName) {
+        if (firstName || lastName || password) {
+            // lookup the user
+            dataLibrary.read("users", userName, (readError, user) => {
+                if (!readError && user) {
+                    const userData = utilities.parseJSON(user);
+                    if (firstName) {
+                        userData.firstName = firstName;
+                    }
+                    if (lastName) {
+                        userData.lastName = lastName;
+                    }
+                    if (password) {
+                        userData.password = password;
+                    }
+                    if (phoneNumber) {
+                        userData.phoneNumber = phoneNumber;
+                    }
+                    dataLibrary.update("users", userName, userData, (updateError) => {
+                        if (!updateError) {
+                            callback(200, {
+                                message: "Successfully updated user data.",
+                            });
+                        } else {
+                            callback(500, {
+                                error: "There is an error occurs to update user data.",
+                            });
+                        }
+                    });
+                } else {
+                    callback(400, {
+                        error: "Your requested user couldn't find.",
+                    });
+                }
+            });
+        } else {
+            callback(400, {
+                error: "Please provide the data which you want to update.",
+            });
+        }
+    } else {
+        callback(400, {
+            error: "Your requested username couldn't found. Please try again!",
+        });
+    }
 };
 
 // Delete method
 userHandler._users.delete = (requestProps, callback) => {
-    callback(200, {
-        message: "This is from delete method",
-    });
+    const userName =
+        typeof requestProps.queryStringObj.userName === "string" &&
+        requestProps.queryStringObj.userName.trim().length > 0
+            ? requestProps.queryStringObj.userName
+            : null;
+    if (userName) {
+        // Lookup the user
+        dataLibrary.read("users", userName, (readError, readData) => {
+            if (!readError && readData) {
+                dataLibrary.delete("users", userName, (deleteError) => {
+                    if (!deleteError) {
+                        callback(200, {
+                            message: "Successfully deleted the user.",
+                        });
+                    } else {
+                        callback(500, {
+                            error: "Couldn't delete the user.",
+                        });
+                    }
+                });
+            } else {
+                callback(400, {
+                    error: "Your requested user couldn't found.",
+                });
+            }
+        });
+    } else {
+        callback(404, {
+            error: "Please provide a username.",
+        });
+    }
 };
 
 // Export module

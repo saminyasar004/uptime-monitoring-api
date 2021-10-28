@@ -141,7 +141,7 @@ lib.update = (dir, fileName, data, callback) => {
 
 // Delete an existing file
 /**
- * Delete an existing file
+ * Delete an existing file and remove the parent directory if it is empty
  *
  * @param {PathDirectory} dir - Path directory of the file without file name
  * @param {fileName} fileName - The name of the file without extesion
@@ -155,7 +155,33 @@ lib.delete = (dir, fileName, callback) => {
             .replace(/^\/+|\/$/gi, "")}.json`,
         (err) => {
             if (!err) {
-                callback(false);
+                // Lookup the directory if it is empty or not
+                fs.readdir(
+                    `${lib.baseDir}/${dir.trim().replace(/^\/+|\/$/gi, "")}`,
+                    (err, files) => {
+                        if (!err && files) {
+                            if (files.length === 0) {
+                                // Remove the directory if it is empty
+                                fs.rmdir(
+                                    `${lib.baseDir}/${dir.trim().replace(/^\/+|\/$/gi, "")}`,
+                                    (err) => {
+                                        if (!err) {
+                                            callback(false);
+                                        } else {
+                                            callback(
+                                                "Error occurs on deleting an empty directory."
+                                            );
+                                        }
+                                    }
+                                );
+                            } else {
+                                callback(false);
+                            }
+                        } else {
+                            callback(false);
+                        }
+                    }
+                );
             } else {
                 callback("Error occures on deleting file.");
             }
