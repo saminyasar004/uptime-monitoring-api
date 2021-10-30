@@ -7,12 +7,14 @@
 
 // Dependencies
 const { handle: userHandler } = require("../handlers/routesHandler/userHandler");
+const { handle: tokenHandler } = require("../handlers/routesHandler/tokenHandler");
 const { handle: sampleHandler } = require("../handlers/routesHandler/sampleHandler");
 const { handle: notFoundHandler } = require("../handlers/routesHandler/notFoundHandler");
 
 // Routes object
 const routes = {
     user: userHandler,
+    token: tokenHandler,
     sample: sampleHandler,
     notFound: notFoundHandler,
 };

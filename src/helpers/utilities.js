@@ -41,5 +41,22 @@ utilities.encrypt = (str) => {
     return null;
 };
 
+/**
+ * Create a random string according to passes string length
+ *
+ * @param {Number} strLen - The length of the string
+ * @returns {String} - A random string with `strLen` length;
+ */
+utilities.createRandomString = (len) => {
+    const strLen = typeof len === "number" && len >= 10 ? len : 10;
+    const acceptedCharacters = "abcdefghijklmnopqrstuvwxyz1234567890";
+    let randomCharacters = "";
+    for (let i = 1; i <= strLen; i += 1) {
+        randomCharacters +=
+            acceptedCharacters[Math.floor(Math.random() * acceptedCharacters.length)];
+    }
+    return randomCharacters;
+};
+
 // Export module
 module.exports = utilities;
