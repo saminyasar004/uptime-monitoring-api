@@ -269,10 +269,7 @@ userHandler._users.delete = (requestProps, callback) => {
                         if (!readError && readData) {
                             dataLibrary.delete("users", userName, (userDeleteError) => {
                                 if (!userDeleteError) {
-                                    // callback(200, {
-                                    //     message: "Successfully deleted the user.",
-                                    // });
-                                    dataLibrary.delete("tokens", tokenId, (tokenDeleteError) => {
+                                    dataLibrary.delete("tokens", userName, (tokenDeleteError) => {
                                         if (!tokenDeleteError) {
                                             callback(200, {
                                                 message:

@@ -29,26 +29,26 @@ tokenHandler._token = {};
 
 // Get method
 tokenHandler._token.get = (requestProps, callback) => {
-    const tokenId =
-        typeof requestProps.queryStringObj.tokenId === "string" &&
-        requestProps.queryStringObj.tokenId.trim().length >= 10
-            ? requestProps.queryStringObj.tokenId
+    const userName =
+        typeof requestProps.queryStringObj.userName === "string" &&
+        requestProps.queryStringObj.userName.trim().length >= 0
+            ? requestProps.queryStringObj.userName
             : null;
-    if (tokenId) {
+    if (userName) {
         // Lookup the token
-        dataLibrary.read("tokens", tokenId, (err, tokenData) => {
+        dataLibrary.read("tokens", userName, (err, tokenData) => {
             if (!err && tokenData) {
                 const tokenObj = utilities.parseJSON(tokenData);
                 callback(200, tokenObj);
             } else {
                 callback(404, {
-                    error: "Your requested token couldn't find.",
+                    error: "Your requested user's token couldn't find.",
                 });
             }
         });
     } else {
         callback(400, {
-            error: "Please provide a token.",
+            error: "Please provide an username to get token.",
         });
     }
 };
@@ -79,7 +79,7 @@ tokenHandler._token.post = (requestProps, callback) => {
                         validationTime,
                     };
                     // stores the token in file system
-                    dataLibrary.create("tokens", tokenId, tokenObj, (createError) => {
+                    dataLibrary.create("tokens", userName, tokenObj, (createError) => {
                         if (!createError) {
                             callback(200, tokenObj);
                         } else {
@@ -108,41 +108,41 @@ tokenHandler._token.post = (requestProps, callback) => {
 
 // Put method
 tokenHandler._token.put = (requestProps, callback) => {
-    const tokenId =
-        typeof requestProps.reqBody.tokenId === "string" &&
-        requestProps.reqBody.tokenId.trim().length >= 10
-            ? requestProps.reqBody.tokenId
+    const userName =
+        typeof requestProps.reqBody.userName === "string" &&
+        requestProps.reqBody.userName.trim().length >= 0
+            ? requestProps.reqBody.userName
             : null;
     const extend = !!(
         typeof requestProps.reqBody.extend === "boolean" && requestProps.reqBody.extend === true
     );
 
-    if (tokenId && extend) {
-        dataLibrary.read("tokens", tokenId, (readError, readData) => {
+    if (userName && extend) {
+        dataLibrary.read("tokens", userName, (readError, readData) => {
             if (!readError && readData) {
                 const tokenData = utilities.parseJSON(readData);
                 if (tokenData.validationTime > Date.now()) {
                     tokenData.validationTime = Date.now() + 60 * 60 * 1000;
-                    dataLibrary.update("tokens", tokenId, tokenData, (updateError) => {
+                    dataLibrary.update("tokens", userName, tokenData, (updateError) => {
                         if (!updateError) {
                             callback(200, {
                                 message:
-                                    "Successfully extend validation time of your requested token.",
+                                    "Successfully extend validation time of your requested user's token.",
                             });
                         } else {
                             callback(500, {
-                                error: "Couldn't extend the validation time of your requested token.",
+                                error: "Couldn't extend the validation time of your requested user's token.",
                             });
                         }
                     });
                 } else {
                     callback(400, {
-                        error: "Your requested token is invalid.",
+                        error: "Your requested user's token is invalid.",
                     });
                 }
             } else {
                 callback(404, {
-                    error: "Your requested token couldn't find.",
+                    error: "Your requested user's have no token.",
                 });
             }
         });
@@ -155,46 +155,46 @@ tokenHandler._token.put = (requestProps, callback) => {
 
 // Delete method
 tokenHandler._token.delete = (requestProps, callback) => {
-    const tokenId =
-        typeof requestProps.queryStringObj.tokenId === "string" &&
-        requestProps.queryStringObj.tokenId.trim().length >= 10
-            ? requestProps.queryStringObj.tokenId
+    const userName =
+        typeof requestProps.queryStringObj.userName === "string" &&
+        requestProps.queryStringObj.userName.trim().length >= 0
+            ? requestProps.queryStringObj.userName
             : null;
 
-    if (tokenId) {
+    if (userName) {
         // Lookup the tokenId
-        dataLibrary.read("tokens", tokenId, (readError, readData) => {
+        dataLibrary.read("tokens", userName, (readError, readData) => {
             if (!readError && readData) {
-                dataLibrary.delete("tokens", tokenId, (deleteError) => {
+                dataLibrary.delete("tokens", userName, (deleteError) => {
                     if (!deleteError) {
                         callback(200, {
-                            message: "Successfully deleted the token.",
+                            message: "Successfully deleted the user's token.",
                         });
                     } else {
                         callback(500, {
-                            error: "Couldn't delete the token.",
+                            error: "Couldn't delete the user's token.",
                         });
                     }
                 });
             } else {
                 callback(404, {
-                    error: "Your requested token couldn't find.",
+                    error: "Your requested user's have no token.",
                 });
             }
         });
     } else {
         callback(400, {
-            error: "Please provide a token.",
+            error: "Please provide a username to delete that token.",
         });
     }
 };
 
 // Verify token
 tokenHandler._token.verify = (tokenId, userName, callback) => {
-    dataLibrary.read("tokens", tokenId, (err, data) => {
+    dataLibrary.read("tokens", userName, (err, data) => {
         if (!err && data) {
             const tokenData = utilities.parseJSON(data);
-            if (tokenData.userName === userName && tokenData.validationTime > Date.now()) {
+            if (tokenData.tokenId === tokenId && tokenData.validationTime > Date.now()) {
                 callback(true);
             } else {
                 callback(false);
