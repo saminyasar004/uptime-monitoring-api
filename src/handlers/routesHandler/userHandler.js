@@ -12,6 +12,7 @@ const utilities = require("../../helpers/utilities");
 const {
     _token: { verify: verifyToken },
 } = require("./tokenHandler");
+const config = require("../../helpers/config");
 
 // Module scaffolding
 const userHandler = {};
@@ -20,7 +21,7 @@ const userHandler = {};
 userHandler.handle = (requestProps, callback) => {
     const acceptedMethods = ["get", "post", "put", "delete"];
     if (acceptedMethods.indexOf(requestProps.method) > -1) {
-        userHandler._users[requestProps.method](requestProps, callback);
+        userHandler._user[requestProps.method](requestProps, callback);
     } else {
         // Don't accept request
         callback(405);
@@ -28,10 +29,10 @@ userHandler.handle = (requestProps, callback) => {
 };
 
 // Utilities
-userHandler._users = {};
+userHandler._user = {};
 
 // Get method
-userHandler._users.get = (requestProps, callback) => {
+userHandler._user.get = (requestProps, callback) => {
     const userName =
         typeof requestProps.queryStringObj.userName === "string" &&
         requestProps.queryStringObj.userName.trim().length > 0
@@ -41,7 +42,7 @@ userHandler._users.get = (requestProps, callback) => {
         // Verify the token
         const tokenId =
             typeof requestProps.headersObj.tokenid === "string" &&
-            requestProps.headersObj.tokenid.trim().length >= 10
+            requestProps.headersObj.tokenid.trim().length >= config.minTokenLength
                 ? requestProps.headersObj.tokenid
                 : null;
 
@@ -69,7 +70,7 @@ userHandler._users.get = (requestProps, callback) => {
             });
         } else {
             callback(400, {
-                error: "Please provide a token contains 10 characters.",
+                error: `Please provide a token contains ${config.minTokenLength} characters.`,
             });
         }
     } else {
@@ -80,7 +81,7 @@ userHandler._users.get = (requestProps, callback) => {
 };
 
 // Post method
-userHandler._users.post = (requestProps, callback) => {
+userHandler._user.post = (requestProps, callback) => {
     const firstName =
         typeof requestProps.reqBody.firstName === "string" &&
         requestProps.reqBody.firstName.trim().length > 0
@@ -123,6 +124,7 @@ userHandler._users.post = (requestProps, callback) => {
                     phoneNumber,
                     password,
                     tosAgreement,
+                    checks: [],
                 };
                 dataLibrary.create("users", userName, userObj, (createError) => {
                     if (!createError) {
@@ -152,7 +154,7 @@ userHandler._users.post = (requestProps, callback) => {
 };
 
 // Put method
-userHandler._users.put = (requestProps, callback) => {
+userHandler._user.put = (requestProps, callback) => {
     const firstName =
         typeof requestProps.reqBody.firstName === "string" &&
         requestProps.reqBody.firstName.trim().length > 0
@@ -183,7 +185,7 @@ userHandler._users.put = (requestProps, callback) => {
             // Verify the token
             const tokenId =
                 typeof requestProps.headersObj.tokenid === "string" &&
-                requestProps.headersObj.tokenid.trim().length >= 10
+                requestProps.headersObj.tokenid.trim().length >= config.minTokenLength
                     ? requestProps.headersObj.tokenid
                     : null;
 
@@ -231,7 +233,7 @@ userHandler._users.put = (requestProps, callback) => {
                 });
             } else {
                 callback(400, {
-                    error: "Please provide a token contains 10 characters.",
+                    error: `Please provide a token contains ${config.minTokenLength} characters.`,
                 });
             }
         } else {
@@ -247,7 +249,7 @@ userHandler._users.put = (requestProps, callback) => {
 };
 
 // Delete method
-userHandler._users.delete = (requestProps, callback) => {
+userHandler._user.delete = (requestProps, callback) => {
     const userName =
         typeof requestProps.queryStringObj.userName === "string" &&
         requestProps.queryStringObj.userName.trim().length > 0
@@ -257,7 +259,7 @@ userHandler._users.delete = (requestProps, callback) => {
         // Verify the token
         const tokenId =
             typeof requestProps.headersObj.tokenid === "string" &&
-            requestProps.headersObj.tokenid.trim().length >= 10
+            requestProps.headersObj.tokenid.trim().length >= config.minTokenLength
                 ? requestProps.headersObj.tokenid
                 : null;
 
@@ -271,10 +273,30 @@ userHandler._users.delete = (requestProps, callback) => {
                                 if (!userDeleteError) {
                                     dataLibrary.delete("tokens", userName, (tokenDeleteError) => {
                                         if (!tokenDeleteError) {
-                                            callback(200, {
-                                                message:
-                                                    "Successfully deleted the user & user's token.",
-                                            });
+                                            // also delete the check file if user has check
+                                            if (utilities.parseJSON(readData).checks.length) {
+                                                dataLibrary.delete(
+                                                    "checks",
+                                                    userName,
+                                                    (checkDeleteError) => {
+                                                        if (!checkDeleteError) {
+                                                            callback(200, {
+                                                                message:
+                                                                    "Successfully deleted all data of your requested user.",
+                                                            });
+                                                        } else {
+                                                            callback(500, {
+                                                                error: "Couldn't delete the user's checks.",
+                                                            });
+                                                        }
+                                                    }
+                                                );
+                                            } else {
+                                                callback(200, {
+                                                    message:
+                                                        "Successfully deleted all data of your requested user.",
+                                                });
+                                            }
                                         } else {
                                             callback(500, {
                                                 error: "Couldn't delete the user's token.",
@@ -301,7 +323,7 @@ userHandler._users.delete = (requestProps, callback) => {
             });
         } else {
             callback(400, {
-                error: "Please provide a token contains 10 characters.",
+                error: `Please provide a token contains ${config.minTokenLength} characters.`,
             });
         }
     } else {

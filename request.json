@@ -1,11 +1,39 @@
 {
-    "firstName": "Nabil",
-    "lastName": "Mahmud",
-    "phoneNumber": "01830027750",
-    "tosAgreement": true,
-    "userName": "nabilmahmud",
-    "password": "ewrwqepruwoeir",
+    "createUser": {
+        "firstName": "Nabil",
+        "lastName": "Mahmud",
+        "phoneNumber": "01830027750",
+        "tosAgreement": true,
+        "userName": "nabilmahmud",
+        "password": "1234"
+    },
 
-    "userName": "nabilmahmud",
-    "password": "ewrwqepruwoeir"
+    "createToken": {
+        "userName": "nabilmahmud",
+        "password": "1234"
+    },
+
+    "updateToken": {
+        "userName": "nabilmahmud",
+        "extend": true
+    },
+
+    "createCheck": {
+        "userName": "nabilmahmud",
+        "protocol": "https",
+        "url": "saminyasar.netlify.app",
+        "method": "get",
+        "successCodes": [200, 202],
+        "timeoutSeconds": 4
+    },
+
+    "updateCheck": {
+        "userName": "nabilmahmud",
+        "checkId": "mr0gndnr8nqmp0wjbp2v",
+        "protocol": "https",
+        "url": "github.com",
+        "method": "post",
+        "successCodes": [200, 202],
+        "timeoutSeconds": 4
+    }
 }

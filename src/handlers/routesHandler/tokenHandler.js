@@ -3,12 +3,13 @@
  * Title: Token handler
  * Description: Handle token related routes
  * Author: Samin Yasar
- * Date: 24/October/2021
+ * Date: 27/October/2021
  */
 
 // Dependencies
 const dataLibrary = require("../../lib/data");
 const utilities = require("../../helpers/utilities");
+const config = require("../../helpers/config");
 
 // Module scaffolding
 const tokenHandler = {};
@@ -71,7 +72,7 @@ tokenHandler._token.post = (requestProps, callback) => {
             if (!err && readData) {
                 const userData = utilities.parseJSON(readData);
                 if (password === userData.password) {
-                    const tokenId = utilities.createRandomString(20);
+                    const tokenId = utilities.createRandomString(config.minTokenLength, 20);
                     const validationTime = Date.now() + 60 * 60 * 1000;
                     const tokenObj = {
                         userName,
@@ -137,7 +138,7 @@ tokenHandler._token.put = (requestProps, callback) => {
                     });
                 } else {
                     callback(400, {
-                        error: "Your requested user's token is invalid.",
+                        error: "Your requested user's token is already expired!",
                     });
                 }
             } else {
@@ -148,7 +149,7 @@ tokenHandler._token.put = (requestProps, callback) => {
         });
     } else {
         callback(400, {
-            error: "Please provide a token id and extend value.",
+            error: "Please provide a username and extend value.",
         });
     }
 };
