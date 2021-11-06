@@ -189,5 +189,18 @@ lib.delete = (dir, fileName, callback) => {
     );
 };
 
+// Get all files list from given directory
+lib.fileList = (dir, callback) => {
+    // Lookup the directory
+    fs.readdir(`${lib.baseDir}/${dir.trim().replace(/^\/+|\/$/gi, "")}`, (err, files) => {
+        if (!err && files && files.length > 0) {
+            const trimmedFileNames = files.map((file) => file.trim().replace(".json", ""));
+            callback(false, trimmedFileNames);
+        } else {
+            callback(`${dir} is empty!`);
+        }
+    });
+};
+
 // Export module
 module.exports = lib;

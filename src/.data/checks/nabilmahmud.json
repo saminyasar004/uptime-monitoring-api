@@ -1,0 +1,22 @@
+{
+    "checks": [
+        {
+            "userName": "nabilmahmud",
+            "checkId": "3718vxywnjpn49tzm48m",
+            "protocol": "https",
+            "url": "saminyasar.netlify.app",
+            "method": "get",
+            "successCodes": [200, 202],
+            "timeoutSeconds": 4
+        },
+        {
+            "userName": "nabilmahmud",
+            "checkId": "ybf42gcp0ko3nemfpfee",
+            "protocol": "https",
+            "url": "github.com",
+            "method": "get",
+            "successCodes": [200, 202],
+            "timeoutSeconds": 4
+        }
+    ]
+}

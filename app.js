@@ -1,31 +1,25 @@
 /**
- * Title: Uptime monitoring application
- * Description: A RESTful API to monitor up or down time of user defined links
+ * Title: Initial file
+ * Description: Project initial file to starts server and workers
  * Author: Samin Yasar
  * Date: 24/October/2021
  */
 
 // Dependencies
-const http = require("http");
-const { handle: reqResHandler } = require("./src/helpers/reqResHandler");
-const environment = require("./src/helpers/environment");
+const server = require("./src/helpers/server");
+const worker = require("./src/helpers/worker");
 
 // Module scaffolding
 const app = {};
 
-// Configuration
-app.config = {};
-
-// Defination of the init function
+// Definition of the initialize function of the app
 app.init = () => {
-    // Create server
-    const server = http.createServer(reqResHandler);
+    // Start the server
+    server.init();
 
-    // Listen the server
-    server.listen(environment.port, () => {
-        console.log(`Listening on port: ${environment.port}.`);
-    });
+    // Start the workers
+    worker.init();
 };
 
-// Initialize app
+// Initialize the app
 app.init();
